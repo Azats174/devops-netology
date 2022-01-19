@@ -102,12 +102,53 @@ This directory/home/azat/netology is  not git directory
 
 ### Ваш скрипт:
 ```python
-???
+##!/usr/bin/env python3
+
+import socket as s
+import time as t
+import datetime as dt
+
+# set variables 
+i = 1
+wait = 2 
+srv = {'drive.google.com':'0.0.0.0', 'mail.google.com':'0.0.0.0', 'google.com':'0.0.0.0'}
+init=0
+
+print('**start script**')
+print(srv)
+print('********************')
+
+while 1==1 : #check  count 
+  for host in srv:
+    ip = s.gethostbyname(host)
+    if ip != srv[host]:
+      if i==1 and init !=1:
+        print(str(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+srv[host]+' '+ip)
+      srv[host]=ip
+# count iteration for debug, comment 3 line if you need 
+  i+=1 
+  if i >= 50 : 
+    break
+  t.sleep(wait)
+
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+azat@nout2:~/netology/devops-netology/04-script-02-py$ python script_4.py 
+**start script**
+{'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
+********************
+2022-01-03 21:07:15 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 142.250.74.46
+2022-01-03 21:07:15 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 142.250.74.101
+2022-01-03 21:07:15 [ERROR] google.com IP mistmatch: 0.0.0.0 142.250.74.142
+**start script**
+{'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
+********************
+2022-01-03 21:07:15 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 142.250.74.46
+2022-01-03 21:07:15 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 142.250.74.101
+2022-01-03 21:07:15 [ERROR] google.com IP mistmatch
+
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
