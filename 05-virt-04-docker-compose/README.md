@@ -24,4 +24,8 @@ Build 'yandex' finished after 2 minutes 5 seconds.
 Задача 2
 ![alt text](https://github.com/Azats174/devops-netology/blob/main/05-virt-04-docker-compose/hw_netology_5.4.2.png)
 
+Задача 3
+
+![alt text](https://github.com/Azats174/devops-netology/blob/main/05-virt-04-docker-compose/hw_netology_5.4.3.png)
+
 
