@@ -25,14 +25,14 @@
   
 Задание 2
 
-root@node01 ~]# docker node ls
-ID                            HOSTNAME             STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
-p9xm33dao0trspqbnqdupvua7 *   node01.netology.yc   Ready     Active         Leader           20.10.12
-4pbzornfdvemypke8mi0ksz22     node02.netology.yc   Ready     Active         Reachable        20.10.12
-gir43n60bxl8jjafaafn2jhrt     node03.netology.yc   Ready     Active         Reachable        20.10.12
-m70str5ksimr4mlglodusl9mb     node04.netology.yc   Ready     Active                          20.10.12
-khtys3r1tls9y7nb58q8g80t2     node05.netology.yc   Ready     Active                          20.10.12
-strxb8pl1ljooargqu7vxk19b     node06.netology.yc   Ready     Active                          20.10.12
+>root@node01 ~]# docker node ls
+>ID                            HOSTNAME             STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+>p9xm33dao0trspqbnqdupvua7 *   node01.netology.yc   Ready     Active         Leader           20.10.12
+>pbzornfdvemypke8mi0ksz22     node02.netology.yc   Ready     Active         Reachable        20.10.12
+>gir43n60bxl8jjafaafn2jhrt     node03.netology.yc   Ready     Active         Reachable        20.10.12
+>m70str5ksimr4mlglodusl9mb     node04.netology.yc   Ready     Active                          20.10.12
+>khtys3r1tls9y7nb58q8g80t2     node05.netology.yc   Ready     Active                          20.10.12
+>strxb8pl1ljooargqu7vxk19b     node06.netology.yc   Ready     Active                          20.10.12
 
 Задание 3
 
