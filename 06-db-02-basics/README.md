@@ -188,7 +188,7 @@ test_db=# explain select * from clients as c where exists (select id from orders
 ```
 2 способ
 
-``
+```
 test_db=# explain select * from clients  where  booking is not null;
                         QUERY PLAN                         
 -----------------------------------------------------------
@@ -196,15 +196,20 @@ test_db=# explain select * from clients  where  booking is not null;
    Filter: (booking IS NOT NULL)
 (2 rows)
 ```
-2способ боллее выгодный чем первый.
+2 способ более выгодный чем первый.
+
+
 ## Обязательная задача 6
 
+Делаем  бэкап
 ```
 root@c327ef3c9de4:/# pg_dump -U test test_db -f /backup/dump_test.sql
 
 ls /backup/dump_test.sql -l
 -rw-r--r-- 1 root root 2197 Mar  3 06:54 /backup/dump_test.sql
-
+```
+останвливаем  контайнер и удалям образ
+```
 docker-compose down
 Stopping 06-db-02-basics_db_1 ... 
 db_1  | 2022-03-03 06:56:12.202 UTC [1] LOG:  received fast shutdown request
@@ -215,14 +220,24 @@ Stopping 06-db-02-basics_db_1 ... done
 06-db-02-basics_db_1 exited with code 0
 Removing 06-db-02-basics_db_1 ... done
 Removing network 06-db-02-basics_default
-[1]+  Завершён        docker-compose up
-
+[1]+  Завершён        
+```
+Переименовали  будуший  котайнер и запустили
+```
+docker-compose up
+```
+Подключились к  новому  контаенеру 
+```
 docker exec -it  test_2  bash
 root@61f3e26f332f:/# 
+```
+запустили востановление с   бэкапа
+```
 root@61f3e26f332f:/# 
 root@61f3e26f332f:/#  psql -U test -d test_db -f /backup/dump_test.sql 
-
-
+```
+проверили  таблицы
+```
 test_db=#  \d
         List of relations
  Schema |  Name   | Type  | Owner 
