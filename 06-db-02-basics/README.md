@@ -146,6 +146,7 @@ UPDATE 1
 UPDATE 1
 UPDATE 1
 ```
+1 способ
 ```
 test_db=# select * from clients as c where  exists (select id from orders as o where c.booking = o.id) ;
  id |       lastname       | country | booking 
@@ -155,6 +156,7 @@ test_db=# select * from clients as c where  exists (select id from orders as o w
   3 | Иоганн Себастьян Бах | Japan   |       5
 (3 rows)
 ```
+2 способ
 ```
 test_db=#  select * from clients where booking is not null;
  id |       lastname       | country | booking 
@@ -168,7 +170,12 @@ test_db=#  select * from clients where booking is not null;
 
 ## Обязательная задача 5
 
+С помощью  оператора **explain**  который выводит план выполнения, генерируемый планировщиком PostgreSQL для заданного оператора. Наибольший интерес в выводимой информации представляет ожидаемая стоимость выполнения оператора, которая показывает, сколько, по мнению планировщика, будет выполняться этот оператор.
+
+1 способ 
+
 ```
+
 test_db=# explain select * from clients as c where exists (select id from orders as o where c.booking = o.id);
                                QUERY PLAN                               
 ------------------------------------------------------------------------
@@ -179,7 +186,9 @@ test_db=# explain select * from clients as c where exists (select id from orders
          ->  Seq Scan on orders o  (cost=0.00..22.00 rows=1200 width=4)
 (5 rows)
 ```
-```
+2 способ
+
+``
 test_db=# explain select * from clients  where  booking is not null;
                         QUERY PLAN                         
 -----------------------------------------------------------
@@ -187,6 +196,7 @@ test_db=# explain select * from clients  where  booking is not null;
    Filter: (booking IS NOT NULL)
 (2 rows)
 ```
+2способ боллее выгодный чем первый.
 ## Обязательная задача 6
 
 ```
