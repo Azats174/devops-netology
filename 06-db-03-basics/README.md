@@ -88,21 +88,35 @@ mysql> select count(*) from orders where price >300;
 ```
 
 ## Обязательная задача 2
-``
+Создаю поьзователя  с требуемыми параметрами
+плагин авторизации mysql_native_password
+```
 mysql>  CREATE USER 'test'@'localhost' IDENTIFIED BY 'test-pass';
 Query OK, 0 rows affected (0.12 sec)
+```
+аттрибуты пользователя:
 
+    Фамилия "Pretty"
+    Имя "James"
+```
 mysql> ALTER USER 'test'@'localhost' ATTRIBUTE '{"fname":"James", "lname":"Pretty"}';
 Query OK, 0 rows affected (0.13 sec)
 
-
+```
+срок истечения пароля - 180 дней
+количество попыток авторизации - 3
+максимальное количество запросов в час - 100
+```
 mysql> ALTER USER 'test'@'localhost' WITH MAX_QUERIES_PER_HOUR 100 
     -> PASSWORD EXPIRE INTERVAL 180 DAY
     -> FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2;
 Query OK, 0 rows affected (0.12 sec)
-
+```
+Предоставьте привелегии пользователю test на операции SELECT базы test_db
+```
 mysql> GRANT Select ON test_db.orders TO 'test'@'localhost';
 Query OK, 0 rows affected, 1 warning (0.08 sec)
+
 
 mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
 +------+-----------+---------------------------------------+
@@ -112,12 +126,12 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
 | test | localhost | {"fname": "James", "lname": "Pretty"} |
 +------+-----------+---------------------------------------+
 2 rows in set (0.00 sec)
-``
+```
 
 
 ## Обязательная задача 3
 
-``
+```
 
 mysql> SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH FROM information_schema.TABLES WHERE table_name = 'orders' and  TABLE_SCHEMA = 'test_db' ORDER BY ENGINE asc;
 +------------+--------+------------+------------+-------------+--------------+
@@ -129,9 +143,9 @@ mysql> SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH F
 
 mysql> 
 
-``
+```
 
-``
+```
 mysql> ALTER TABLE orders ENGINE = MyISAM;
 Query OK, 5 rows affected (1.20 sec)
 Records: 5  Duplicates: 0  Warnings: 0
@@ -140,9 +154,9 @@ mysql> ALTER TABLE orders ENGINE = InnoDB;
 Query OK, 5 rows affected (1.40 sec)
 Records: 5  Duplicates: 0  Warnings: 0
 
-``
+```
 
-``
+```
 mysql> show profiles;
 +----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Query_ID | Duration   | Query                                                                                                                                                                                |
@@ -152,12 +166,12 @@ mysql> show profiles;
 |        3 | 1.40615800 | ALTER TABLE orders ENGINE = InnoDB                                                                                                                                                   |
 +----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 3 rows in set, 1 warning (0.00 sec)
-``
+```
 
 ## Обязательная задача 4
 
 
-``
+```
 
 [mysqld]
 pid-file        = /var/run/mysqld/mysqld.pid
@@ -178,4 +192,4 @@ key_buffer_size = 640M
 
 #Set log size
 max_binlog_size	= 100M
-``
+```
