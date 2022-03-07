@@ -2,8 +2,9 @@
 # Домашнее задание к занятию "Домашнее задание к занятию "6.3. MYSQL""
 
 ## Обязательная задача 1
-``
 
+Использую манифест для  поднятия контайнера
+```
 version: '3.1'
 services:
   db:
@@ -20,12 +21,15 @@ services:
       - MYSQL_PASSWORD=An0thrS3crt
       - MYSQL_USER=test
       - MYSQL_DATABASE=test_db    
-``
-``
-mysql -p  test_db < /backup/test_dump.sql
-``
+```
 
-``
+Востанавливаю с бэкапа
+```
+mysql -p  test_db < /backup/test_dump.sql
+```
+
+Версия сервера
+```
 mysql> \s
 --------------
 mysql  Ver 8.0.28 for Linux on x86_64 (MySQL Community Server - GPL)
@@ -49,14 +53,17 @@ Binary data as:		Hexadecimal
 Uptime:			10 min 57 sec
 
 Threads: 2  Questions: 52  Slow queries: 0  Opens: 154  Flush tables: 3  Open tables: 72  Queries per second avg: 0.079
-``
-``
+```
+переключаюсь на базу test_db
+```
 mysql> use test_db;
 Reading table information for completion of table and column names
 You can turn off this feature to get a quicker startup with -A
 
 Database changed
-mysql> 
+```
+вывожу список таблиц
+```
 mysql> 
 mysql> show tables;
 +-------------------+
@@ -65,8 +72,10 @@ mysql> show tables;
 | orders            |
 +-------------------+
 1 row in set (0.00 sec)
+```
+количество записей с price > 300
+```
 
-mysql> 
 mysql> 
 mysql> select count(*) from orders where price >300;
 +----------+
@@ -76,7 +85,7 @@ mysql> select count(*) from orders where price >300;
 +----------+
 1 row in set (0.01 sec)
 
-``
+```
 
 ## Обязательная задача 2
 ``
