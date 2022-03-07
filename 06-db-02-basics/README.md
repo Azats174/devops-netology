@@ -2,7 +2,7 @@
 # Домашнее задание к занятию "Домашнее задание к занятию "6.2. SQL""
 
 ## Обязательная задача 1
-
+```
 version: '3.1'
 services:
   db:
@@ -17,9 +17,9 @@ services:
        - ./backup:/backup
     ports:
       - "5432:5432"
-
+```
 ## Обязательная задача 2
-
+```
 mydb=# \l
                              List of databases
    Name    | Owner | Encoding |  Collate   |   Ctype    | Access privileges 
@@ -32,8 +32,8 @@ mydb=# \l
            |       |          |            |            | test=CTc/test
  test_db   | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
 
-
-
+```
+```
 mydb=# \du
                                        List of roles
     Role name     |                         Attributes                         | Member of 
@@ -41,15 +41,17 @@ mydb=# \du
  test             | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
  test-admin-user  | Superuser, No inheritance                                  | {}
  test-simple-user | No inheritance                                             | {}
-
-tast_db=# \dt
+```
+```
+test_db=# \dt
         List of relations
  Schema |  Name   | Type  | Owner 
 --------+---------+-------+-------
  public | clients | table | test
  public | orders  | table | test
 (2 rows)
-
+```
+```
 mydb=# select * from information_schema.table_privileges where grantee in ('test-admin-user','test-simple-user');
  grantor |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarc
 hy 
@@ -78,8 +80,8 @@ test_db=#
 SELECT  *  FROM clients;
  id | lastname | country | booking 
 ----+----------+---------+---------
-
-
+```
+```
 test_db=# \d  orders;
                Table "public.orders"
  Column |  Type   | Collation | Nullable | Default 
@@ -106,20 +108,23 @@ Indexes:
 Foreign-key constraints:
     "clients_booking_fkey" FOREIGN KEY (booking) REFERENCES orders(id)
 
-
+```
 
 ## Обязательная задача 3
-
+```
 test_db=# insert into orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
 INSERT 0 5
 test_db=# insert into clients VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
+```
+```
 select count (*) from orders;
 INSERT 0 5
  count 
 -------
      5
 (1 row)
-
+```
+```
 test_db=# select count (*) from orders;
  count 
 -------
@@ -131,15 +136,18 @@ test_db=# select count (*) from clients;
 -------
      5
 (1 row)
-
+```
 ## Обязательная задача 4
-
+```
 test_db=# update  clients set booking = 3 where id = 1;
 update  clients set booking = 4 where id = 2;
 update  clients set booking = 5 where id = 3;
 UPDATE 1
 UPDATE 1
 UPDATE 1
+```
+1 способ
+```
 test_db=# select * from clients as c where  exists (select id from orders as o where c.booking = o.id) ;
  id |       lastname       | country | booking 
 ----+----------------------+---------+---------
@@ -147,7 +155,9 @@ test_db=# select * from clients as c where  exists (select id from orders as o w
   2 | Петров Петр Петрович | Canada  |       4
   3 | Иоганн Себастьян Бах | Japan   |       5
 (3 rows)
-
+```
+2 способ
+```
 test_db=#  select * from clients where booking is not null;
  id |       lastname       | country | booking 
 ----+----------------------+---------+---------
@@ -156,9 +166,15 @@ test_db=#  select * from clients where booking is not null;
   3 | Иоганн Себастьян Бах | Japan   |       5
 (3 rows)
 
-
+```
 
 ## Обязательная задача 5
+
+С помощью  оператора **explain**  который выводит план выполнения, генерируемый планировщиком PostgreSQL для заданного оператора. Наибольший интерес в выводимой информации представляет ожидаемая стоимость выполнения оператора, которая показывает, сколько, по мнению планировщика, будет выполняться этот оператор.
+
+1 способ 
+
+```
 
 test_db=# explain select * from clients as c where exists (select id from orders as o where c.booking = o.id);
                                QUERY PLAN                               
@@ -169,22 +185,31 @@ test_db=# explain select * from clients as c where exists (select id from orders
    ->  Hash  (cost=22.00..22.00 rows=1200 width=4)
          ->  Seq Scan on orders o  (cost=0.00..22.00 rows=1200 width=4)
 (5 rows)
+```
+2 способ
 
+```
 test_db=# explain select * from clients  where  booking is not null;
                         QUERY PLAN                         
 -----------------------------------------------------------
  Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
    Filter: (booking IS NOT NULL)
 (2 rows)
+```
+2 способ более выгодный чем первый.
+
 
 ## Обязательная задача 6
 
-
+Делаем  бэкап
+```
 root@c327ef3c9de4:/# pg_dump -U test test_db -f /backup/dump_test.sql
 
 ls /backup/dump_test.sql -l
 -rw-r--r-- 1 root root 2197 Mar  3 06:54 /backup/dump_test.sql
-
+```
+останвливаем  контайнер и удалям образ
+```
 docker-compose down
 Stopping 06-db-02-basics_db_1 ... 
 db_1  | 2022-03-03 06:56:12.202 UTC [1] LOG:  received fast shutdown request
@@ -195,14 +220,24 @@ Stopping 06-db-02-basics_db_1 ... done
 06-db-02-basics_db_1 exited with code 0
 Removing 06-db-02-basics_db_1 ... done
 Removing network 06-db-02-basics_default
-[1]+  Завершён        docker-compose up
-
+[1]+  Завершён        
+```
+Переименовали  будуший  котайнер и запустили
+```
+docker-compose up
+```
+Подключились к  новому  контаенеру 
+```
 docker exec -it  test_2  bash
 root@61f3e26f332f:/# 
+```
+запустили востановление с   бэкапа
+```
 root@61f3e26f332f:/# 
 root@61f3e26f332f:/#  psql -U test -d test_db -f /backup/dump_test.sql 
-
-
+```
+проверили  таблицы
+```
 test_db=#  \d
         List of relations
  Schema |  Name   | Type  | Owner 
@@ -223,3 +258,4 @@ test_db=#  \l
            |       |          |            |            | test=CTc/test
  test_db   | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
 (5 rows)
+```
