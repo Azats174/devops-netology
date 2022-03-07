@@ -2,6 +2,7 @@
 # Домашнее задание к занятию "Домашнее задание к занятию "6.3. MYSQL""
 
 ## Обязательная задача 1
+``
 
 version: '3.1'
 services:
@@ -19,209 +20,153 @@ services:
       - MYSQL_PASSWORD=An0thrS3crt
       - MYSQL_USER=test
       - MYSQL_DATABASE=test_db    
+``
+``
+mysql -p  test_db < /backup/test_dump.sql
+``
+
+``
+mysql> \s
+--------------
+mysql  Ver 8.0.28 for Linux on x86_64 (MySQL Community Server - GPL)
+
+Connection id:		14
+Current database:	
+Current user:		root@localhost
+SSL:			Not in use
+Current pager:		stdout
+Using outfile:		''
+Using delimiter:	;
+Server version:		8.0.28 MySQL Community Server - GPL
+Protocol version:	10
+Connection:		Localhost via UNIX socket
+Server characterset:	utf8mb4
+Db     characterset:	utf8mb4
+Client characterset:	latin1
+Conn.  characterset:	latin1
+UNIX socket:		/var/run/mysqld/mysqld.sock
+Binary data as:		Hexadecimal
+Uptime:			10 min 57 sec
+
+Threads: 2  Questions: 52  Slow queries: 0  Opens: 154  Flush tables: 3  Open tables: 72  Queries per second avg: 0.079
+``
+``
+mysql> use test_db;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> 
+mysql> 
+mysql> show tables;
++-------------------+
+| Tables_in_test_db |
++-------------------+
+| orders            |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> select count(*) from orders where price >300;
++----------+
+| count(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.01 sec)
+
+``
 
 ## Обязательная задача 2
+``
+mysql>  CREATE USER 'test'@'localhost' IDENTIFIED BY 'test-pass';
+Query OK, 0 rows affected (0.12 sec)
 
-mydb=# \l
-                             List of databases
-   Name    | Owner | Encoding |  Collate   |   Ctype    | Access privileges 
------------+-------+----------+------------+------------+-------------------
- mydb      | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- postgres  | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- template0 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- template1 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- test_db   | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
+mysql> ALTER USER 'test'@'localhost' ATTRIBUTE '{"fname":"James", "lname":"Pretty"}';
+Query OK, 0 rows affected (0.13 sec)
 
 
+mysql> ALTER USER 'test'@'localhost' WITH MAX_QUERIES_PER_HOUR 100 
+    -> PASSWORD EXPIRE INTERVAL 180 DAY
+    -> FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2;
+Query OK, 0 rows affected (0.12 sec)
 
-mydb=# \du
-                                       List of roles
-    Role name     |                         Attributes                         | Member of 
-------------------+------------------------------------------------------------+-----------
- test             | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
- test-admin-user  | Superuser, No inheritance                                  | {}
- test-simple-user | No inheritance                                             | {}
+mysql> GRANT Select ON test_db.orders TO 'test'@'localhost';
+Query OK, 0 rows affected, 1 warning (0.08 sec)
 
-tast_db=# \dt
-        List of relations
- Schema |  Name   | Type  | Owner 
---------+---------+-------+-------
- public | clients | table | test
- public | orders  | table | test
-(2 rows)
-
-mydb=# select * from information_schema.table_privileges where grantee in ('test-admin-user','test-simple-user');
- grantor |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarc
-hy 
----------+------------------+---------------+--------------+------------+----------------+--------------+-------------
----
- test    | test-simple-user | mydb          | public       | clients    | INSERT         | NO           | NO
- test    | test-simple-user | mydb          | public       | clients    | SELECT         | NO           | YES
- test    | test-simple-user | mydb          | public       | clients    | UPDATE         | NO           | NO
- test    | test-simple-user | mydb          | public       | clients    | DELETE         | NO           | NO
- test    | test-simple-user | mydb          | public       | orders     | INSERT         | NO           | NO
- test    | test-simple-user | mydb          | public       | orders     | SELECT         | NO           | YES
- test    | test-simple-user | mydb          | public       | orders     | UPDATE         | NO           | NO
- test    | test-simple-user | mydb          | public       | orders     | DELETE         | NO           | NO
-(8 rows)
-
-
-test_db=#  
- 
-SELECT  *  FROM orders;
- id | name | price 
-----+------+-------
-(0 rows)
-
-
-test_db=#   
-SELECT  *  FROM clients;
- id | lastname | country | booking 
-----+----------+---------+---------
-
-
-test_db=# \d  orders;
-               Table "public.orders"
- Column |  Type   | Collation | Nullable | Default 
---------+---------+-----------+----------+---------
- id     | integer |           | not null | 
- name   | text    |           |          | 
- price  | integer |           |          | 
-Indexes:
-    "orders_pkey" PRIMARY KEY, btree (id)
-Referenced by:
-    TABLE "clients" CONSTRAINT "clients_booking_fkey" FOREIGN KEY (booking) REFERENCES orders(id)
-
-
-test_db=# \d  clients;
-               Table "public.clients"
-  Column  |  Type   | Collation | Nullable | Default 
-----------+---------+-----------+----------+---------
- id       | integer |           | not null | 
- lastname | text    |           |          | 
- country  | text    |           |          | 
- booking  | integer |           |          | 
-Indexes:
-    "clients_pkey" PRIMARY KEY, btree (id)
-Foreign-key constraints:
-    "clients_booking_fkey" FOREIGN KEY (booking) REFERENCES orders(id)
-
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
++------+-----------+---------------------------------------+
+| USER | HOST      | ATTRIBUTE                             |
++------+-----------+---------------------------------------+
+| test | %         | NULL                                  |
+| test | localhost | {"fname": "James", "lname": "Pretty"} |
++------+-----------+---------------------------------------+
+2 rows in set (0.00 sec)
+``
 
 
 ## Обязательная задача 3
 
-test_db=# insert into orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
-INSERT 0 5
-test_db=# insert into clients VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
-select count (*) from orders;
-INSERT 0 5
- count 
--------
-     5
-(1 row)
+``
 
-test_db=# select count (*) from orders;
- count 
--------
-     5
-(1 row)
+mysql> SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH FROM information_schema.TABLES WHERE table_name = 'orders' and  TABLE_SCHEMA = 'test_db' ORDER BY ENGINE asc;
++------------+--------+------------+------------+-------------+--------------+
+| TABLE_NAME | ENGINE | ROW_FORMAT | TABLE_ROWS | DATA_LENGTH | INDEX_LENGTH |
++------------+--------+------------+------------+-------------+--------------+
+| orders     | InnoDB | Dynamic    |          5 |       16384 |            0 |
++------------+--------+------------+------------+-------------+--------------+
+1 row in set (0.05 sec)
 
-test_db=# select count (*) from clients;
- count 
--------
-     5
-(1 row)
+mysql> 
+
+``
+
+``
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (1.20 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (1.40 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+``
+
+``
+mysql> show profiles;
++----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Query_ID | Duration   | Query                                                                                                                                                                                |
++----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|        1 | 0.05459025 | SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH FROM information_schema.TABLES WHERE table_name = 'orders' and  TABLE_SCHEMA = 'test_db' ORDER BY ENGINE asc |
+|        2 | 1.19558400 | ALTER TABLE orders ENGINE = MyISAM                                                                                                                                                   |
+|        3 | 1.40615800 | ALTER TABLE orders ENGINE = InnoDB                                                                                                                                                   |
++----------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+3 rows in set, 1 warning (0.00 sec)
+``
 
 ## Обязательная задача 4
 
-test_db=# update  clients set booking = 3 where id = 1;
-update  clients set booking = 4 where id = 2;
-update  clients set booking = 5 where id = 3;
-UPDATE 1
-UPDATE 1
-UPDATE 1
-test_db=# select * from clients as c where  exists (select id from orders as o where c.booking = o.id) ;
- id |       lastname       | country | booking 
-----+----------------------+---------+---------
-  1 | Иванов Иван Иванович | USA     |       3
-  2 | Петров Петр Петрович | Canada  |       4
-  3 | Иоганн Себастьян Бах | Japan   |       5
-(3 rows)
 
-test_db=#  select * from clients where booking is not null;
- id |       lastname       | country | booking 
-----+----------------------+---------+---------
-  1 | Иванов Иван Иванович | USA     |       3
-  2 | Петров Петр Петрович | Canada  |       4
-  3 | Иоганн Себастьян Бах | Japan   |       5
-(3 rows)
+``
 
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= NULL
+#Set IO Speed
+innodb_flush_log_at_trx_commit = 0 
 
+#Set compression
+innodb_file_format=Barracuda
 
-## Обязательная задача 5
+#Set buffer
+innodb_log_buffer_size	= 1M
 
-test_db=# explain select * from clients as c where exists (select id from orders as o where c.booking = o.id);
-                               QUERY PLAN                               
-------------------------------------------------------------------------
- Hash Join  (cost=37.00..57.24 rows=810 width=72)
-   Hash Cond: (c.booking = o.id)
-   ->  Seq Scan on clients c  (cost=0.00..18.10 rows=810 width=72)
-   ->  Hash  (cost=22.00..22.00 rows=1200 width=4)
-         ->  Seq Scan on orders o  (cost=0.00..22.00 rows=1200 width=4)
-(5 rows)
+#Set Cache size
+key_buffer_size = 640M
 
-test_db=# explain select * from clients  where  booking is not null;
-                        QUERY PLAN                         
------------------------------------------------------------
- Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
-   Filter: (booking IS NOT NULL)
-(2 rows)
-
-## Обязательная задача 6
-
-
-root@c327ef3c9de4:/# pg_dump -U test test_db -f /backup/dump_test.sql
-
-ls /backup/dump_test.sql -l
--rw-r--r-- 1 root root 2197 Mar  3 06:54 /backup/dump_test.sql
-
-docker-compose down
-Stopping 06-db-02-basics_db_1 ... 
-db_1  | 2022-03-03 06:56:12.202 UTC [1] LOG:  received fast shutdown request
-db_1  | 2022-03-03 06:56:12.272 UTC [1] LOG:  aborting any active transactions
-db_1  | 2022-03-03 06:56:12.274 UTC [1] LOG:  background worker "logical replication launcher" (PID 83) exited with exit code 1
-db_1  | 2022-03-03 06:56:12.274 UTC [78] LOG:  shutting down
-Stopping 06-db-02-basics_db_1 ... done
-06-db-02-basics_db_1 exited with code 0
-Removing 06-db-02-basics_db_1 ... done
-Removing network 06-db-02-basics_default
-[1]+  Завершён        docker-compose up
-
-docker exec -it  test_2  bash
-root@61f3e26f332f:/# 
-root@61f3e26f332f:/# 
-root@61f3e26f332f:/#  psql -U test -d test_db -f /backup/dump_test.sql 
-
-
-test_db=#  \d
-        List of relations
- Schema |  Name   | Type  | Owner 
---------+---------+-------+-------
- public | clients | table | test
- public | orders  | table | test
-(2 rows)
-
-test_db=#  \l
-                             List of databases
-   Name    | Owner | Encoding |  Collate   |   Ctype    | Access privileges 
------------+-------+----------+------------+------------+-------------------
- mydb      | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- postgres  | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- template0 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- template1 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- test_db   | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
-(5 rows)
+#Set log size
+max_binlog_size	= 100M
+``
