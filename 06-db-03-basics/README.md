@@ -131,6 +131,7 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER='test';
 
 ## Обязательная задача 3
 
+ Версия движка
 ```
 
 mysql> SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH FROM information_schema.TABLES WHERE table_name = 'orders' and  TABLE_SCHEMA = 'test_db' ORDER BY ENGINE asc;
@@ -144,6 +145,7 @@ mysql> SELECT TABLE_NAME,ENGINE,ROW_FORMAT,TABLE_ROWS,DATA_LENGTH,INDEX_LENGTH F
 mysql> 
 
 ```
+Смена движка
 
 ```
 mysql> ALTER TABLE orders ENGINE = MyISAM;
@@ -170,6 +172,7 @@ mysql> show profiles;
 
 ## Обязательная задача 4
 
+Изменененный конфиг
 
 ```
 
