@@ -1,0 +1,22 @@
+{
+  "Services": {
+    "db": {
+      "Env": [
+        "POSTGRES_USER=test",
+        "POSTGRES_PASSWORD=test123",
+        "POSTGRES_DB=mydb"
+      ],
+      "Image": "postgres@sha256:f94f4b7ac0ccd4d1b079e7035c21987712d4ee7f650f32a7049e38f4e46aca71",
+      "Networks": [
+        "default"
+      ],
+      "Ports": [
+        {
+          "Port": 5432,
+          "Protocol": "tcp"
+        }
+      ]
+    }
+  },
+  "Version": "0.1"
+}
