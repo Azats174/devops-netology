@@ -40,9 +40,10 @@ mydb=# \l
 ```
 
 Подключения к базе
+```
 mydb=# \c mydb
 You are now connected to database "mydb" as user "postgres".
-
+```
 ```
 mydb=# \dt
          List of relations
