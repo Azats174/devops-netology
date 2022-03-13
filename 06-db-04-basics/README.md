@@ -20,37 +20,90 @@ services:
       - MYSQL_USER=test
       - MYSQL_DATABASE=test_db    
 
+
+
+
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ mydb      | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(4 rows)
+
+
+mydb=# \c mydb
+You are now connected to database "mydb" as user "postgres".
+
+mydb=# \dt 
+         List of relations
+ Schema |  Name  | Type  |  Owner   
+--------+--------+-------+----------
+ public | orders | table | postgres
+(1 row)
+
+mydb=#  \dS+ orders
+                                                       Table "public.orders"
+ Column |         Type          | Collation | Nullable |              Default               | Storage  | Stats target 
+| Description 
+--------+-----------------------+-----------+----------+------------------------------------+----------+--------------
++-------------
+ id     | integer               |           | not null | nextval('orders_id_seq'::regclass) | plain    |              
+| 
+ title  | character varying(80) |           | not null |                                    | extended |              
+| 
+ price  | integer               |           |          | 0                                  | plain    |              
+| 
+Indexes:
+    "orders_pkey" PRIMARY KEY, btree (id)
+Access method: heap
+
+mydb=# \q
+root@9f7a0c51c610:/
+
 ## Обязательная задача 2
 
-mydb=# \l
-                             List of databases
-   Name    | Owner | Encoding |  Collate   |   Ctype    | Access privileges 
------------+-------+----------+------------+------------+-------------------
- mydb      | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- postgres  | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
- template0 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- template1 | test  | UTF8     | en_US.utf8 | en_US.utf8 | =c/test          +
-           |       |          |            |            | test=CTc/test
- test_db   | test  | UTF8     | en_US.utf8 | en_US.utf8 | 
+
+
+test_database=# ANALYZE VERBOSE public.orders;
+INFO:  analyzing "public.orders"
+INFO:  "orders": scanned 1 of 1 pages, containing 8 live rows and 0 dead rows; 8 rows in sample, 8 estimated total rows
+ANALYZE
+
+test_database=#  select avg_width from pg_stats where tablename='orders';
+ avg_width 
+-----------
+         4
+        16
+         4
+(3 rows)
+
+test_database=# alter table orders rename to orders_simple;
+ALTER TABLE
+
+test_database=# create table orders (id integer, title varchar(80), price integer) partition by range(price);
+CREATE TABLE
+
+test_database=# create table orders_less499 partition of orders for values from (0) to (499);
+CREATE TABLE
+
+create table orders_more499 partition of orders for values from (499) to (999999999);
+CREATE TABLE
+
+test_database=#  insert into orders (id, title, price) select * from orders_simple;
+INSERT 0 8
 
 
 
-mydb=# \du
-                                       List of roles
-    Role name     |                         Attributes                         | Member of 
-------------------+------------------------------------------------------------+-----------
- test             | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
- test-admin-user  | Superuser, No inheritance                                  | {}
- test-simple-user | No inheritance                                             | {}
+test_database=#  pg_dump -U postgres -d test_database > /backup/test_database_dump.sql
 
-tast_db=# \dt
-        List of relations
- Schema |  Name   | Type  | Owner 
---------+---------+-------+-------
- public | clients | table | test
- public | orders  | table | test
-(2 rows)
+
+
 
 mydb=# select * from information_schema.table_privileges where grantee in ('test-admin-user','test-simple-user');
  grantor |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarc
