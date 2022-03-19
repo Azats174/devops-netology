@@ -197,9 +197,86 @@ $ curl -X DELETE 'http://localhost:9200/ind-3?pretty'
   "acknowledged" : true
 }
 ```
-Список  инаксов
+Список  индексов
 ```
 $ curl -X GET 'http://localhost:9200/_cat/indices?v'
 health status index uuid pri rep docs.count docs.deleted store.size pri.store.size
 ```
-индексы в статусе Yellow потому что у них указано число реплик, а по факту нет других серверов, соответсвено реплицировать некуда. 
+индексы в статусе Yellow потому что у них указано число реплик, а по факту нет других серверов, соответсвено реплицировать некуда.
+
+
+
+### Задание 3
+
+Путь для снапшота мы  уже   указали в  кнфиге  при создании докера
+Зарегестрировал  путь до каталога с снапшотами
+
+```
+curl -XPOST localhost:9200/_snapshot/netology_backup?pretty -H 'Content-Type: application/json' -d'{"type": "fs", "settings": { "location":"/elasticsearch-7.11.1/snapshots" }}'
+{
+  "acknowledged" : true
+}
+```
+Ds
+```
+curl http://localhost:9200/_snapshot/netology_backup?pretty 
+{
+  "netology_backup" : {
+    "type" : "fs",
+    "settings" : {
+      "location" : "/elasticsearch-7.11.1/snapshots"
+    }
+  }
+}
+
+```
+Создал индекс test с 0 реплик и 1 шардом
+```
+curl -X PUT localhost:9200/test -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+```
+```
+curl  http://localhost:9200/test?pretty 
+{
+  "test" : {
+    "aliases" : { },
+    "mappings" : { },
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "provided_name" : "test",
+        "creation_date" : "1647671443016",
+        "number_of_replicas" : "0",
+        "uuid" : "keSaKfMaRFKcNJ-9Pfbw1Q",
+        "version" : {
+          "created" : "7110199"
+        }
+      }
+    }
+  }
+}
+```
+Создайте snapshot состояния кластера elasticsearch
+```
+curl -X PUT localhost:9200/_snapshot/netology_backup/elasticsearch?wait_for_completion=true
+{"snapshot":{"snapshot":"elasticsearch","uuid":"W18zCbOQQxOCCrR2aJJiOQ","version_id":7110199,"version":"7.11.1","indices":["test"],"data_streams":[],"include_global_state":true,"state":"SUCCESS","start_time":"2022-03-19T06:37:29.664Z","start_time_in_millis":1647671849664,"end_time":"2022-03-19T06:37:29.664Z","end_time_in_millis":1647671849664,"duration_in_millis":0,"failures":[],"shards":{"total":1,"failed":0,"successful":1}}}
+```
+dddd
+```
+docker exec fd5ea667ee07  ls  /elasticsearch-7.11.1/snapshots
+index-0
+index.latest
+indices
+meta-W18zCbOQQxOCCrR2aJJiOQ.dat
+snap-W18zCbOQQxOCCrR2aJJiOQ.dat
+```
+
+
+
+
