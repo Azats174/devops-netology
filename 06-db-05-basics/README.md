@@ -217,7 +217,7 @@ curl -XPOST localhost:9200/_snapshot/netology_backup?pretty -H 'Content-Type: ap
   "acknowledged" : true
 }
 ```
-Ds
+вывод снапшотов
 ```
 curl http://localhost:9200/_snapshot/netology_backup?pretty 
 {
