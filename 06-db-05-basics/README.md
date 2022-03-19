@@ -82,3 +82,124 @@ azat@nout2:~/netology/06-db-05$ curl localhost:9200
   "tagline" : "You Know, for Search"
 }
 ```
+
+### Задача 2
+
+Рботаем с  этим контайнером
+
+Создал индексы:
+```
+curl -X PUT localhost:9200/ind-1 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+curl -X PUT localhost:9200/ind-2 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
+curl -X PUT localhost:9200/ind-3 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'    
+```
+Список индексов:
+```
+$ curl -X GET 'http://localhost:9200/_cat/indices?v' 
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   ind-1 GsWVsEodQeq71Eehb6Txfg   1   0          0            0       208b           208b
+yellow open   ind-3 kyfE2lpYR4KpIPzvmIEj6A   4   2          0            0       832b           832b
+yellow open   ind-2 w7d7vBSISeCdEfYQu0Thfg   2   1          0            0       416b           416b
+
+``` 
+Статус индексов:
+```
+$ curl -X GET 'http://localhost:9200/_cluster/health/ind-1?pretty' 
+{
+  "cluster_name" : "netology_test",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 1,
+  "active_shards" : 1,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 100.0
+}
+
+$ curl -X GET 'http://localhost:9200/_cluster/health/ind-2?pretty' 
+{
+  "cluster_name" : "netology_test",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 2,
+  "active_shards" : 2,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 2,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 41.17647058823529
+}
+
+$ curl -X GET 'http://localhost:9200/_cluster/health/ind-3?pretty' 
+{
+  "cluster_name" : "netology_test",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 4,
+  "active_shards" : 4,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 8,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 41.17647058823529
+}
+```
+Статус кластера:
+```
+$ curl -XGET localhost:9200/_cluster/health/?pretty=true
+{
+  "cluster_name" : "netology_test",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 7,
+  "active_shards" : 7,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 10,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 41.17647058823529
+}
+```
+Удалил индексы:
+```
+$ curl -X DELETE 'http://localhost:9200/ind-1?pretty' 
+{
+  "acknowledged" : true
+}
+$ curl -X DELETE 'http://localhost:9200/ind-2?pretty' 
+{
+  "acknowledged" : true
+}
+$ curl -X DELETE 'http://localhost:9200/ind-3?pretty' 
+{
+  "acknowledged" : true
+}
+```
+Список  инаксов
+```
+$ curl -X GET 'http://localhost:9200/_cat/indices?v'
+health status index uuid pri rep docs.count docs.deleted store.size pri.store.size
+```
+индексы в статусе Yellow потому что у них указано число реплик, а по факту нет других серверов, соответсвено реплицировать некуда. 
