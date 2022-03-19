@@ -262,12 +262,12 @@ curl  http://localhost:9200/test?pretty
   }
 }
 ```
-Создайте snapshot состояния кластера elasticsearch
+Создал snapshot состояния кластера elasticsearch
 ```
 curl -X PUT localhost:9200/_snapshot/netology_backup/elasticsearch?wait_for_completion=true
 {"snapshot":{"snapshot":"elasticsearch","uuid":"W18zCbOQQxOCCrR2aJJiOQ","version_id":7110199,"version":"7.11.1","indices":["test"],"data_streams":[],"include_global_state":true,"state":"SUCCESS","start_time":"2022-03-19T06:37:29.664Z","start_time_in_millis":1647671849664,"end_time":"2022-03-19T06:37:29.664Z","end_time_in_millis":1647671849664,"duration_in_millis":0,"failures":[],"shards":{"total":1,"failed":0,"successful":1}}}
 ```
-dddd
+Листинг файлов
 ```
 docker exec fd5ea667ee07  ls  /elasticsearch-7.11.1/snapshots
 index-0
@@ -275,6 +275,48 @@ index.latest
 indices
 meta-W18zCbOQQxOCCrR2aJJiOQ.dat
 snap-W18zCbOQQxOCCrR2aJJiOQ.dat
+```
+Список  индексев
+```
+curl -X GET 'http://localhost:9200/_cat/indices?v' 
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test  keSaKfMaRFKcNJ-9Pfbw1Q   1   0          0            0       208b           208b
+```
+Удалил индекс тест
+```
+curl -X DELETE 'http://localhost:9200/test?pretty'
+{
+  "acknowledged" : true
+}
+```
+Создал индекс тест-2
+```
+curl -X PUT localhost:9200/test-2?pretty -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+{
+  "acknowledged" : true,
+  "shards_acknowledged" : true,
+  "index" : "test-2"
+}
+```
+Список индексев
+```
+ curl -X GET 'http://localhost:9200/_cat/indices?v' 
+health status index  uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2 7LmrEBYZR8Wz-ha28UDM5g   1   0          0            0       208b           208b
+```
+Востановил индекс
+```
+curl -X POST localhost:9200/_snapshot/netology_backup/elasticsearch/_restore?pretty -H 'Content-Type: application/json' -d'{"include_global_state":true}'
+{
+  "accepted" : true
+}
+```
+Список  индексев
+```
+curl -X GET 'http://localhost:9200/_cat/indices?v' 
+health status index  uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2 7LmrEBYZR8Wz-ha28UDM5g   1   0          0            0       208b           208b
+green  open   test   Og8bHVp8Rnu0mmom8dAZoQ   1   0          0            0       208b           208b
 ```
 
 
