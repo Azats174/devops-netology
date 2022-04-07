@@ -24,3 +24,12 @@
    Terraform v1.1.6
 on linux_amd64
 ```
+
+Задача 3. Поддержка легаси кода.
+
+Необходимо скачать требуемую версию в бинарном  формате.  И использовать ее. 
+```
+azat@nout2:~/netology/terraform$ ./terraform -v
+Terraform v1.1.7
+on linux_amd64
+```
