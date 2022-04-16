@@ -115,9 +115,21 @@ test_database=#  select avg_width from pg_stats where tablename='orders';
          4
 (3 rows)
 ```
-###обязательная задача 3
+### обязательная задача 3
 
 Нужно преобразовать существующую таблицу в партиционированную поэтому пересоздадим таблицу 
 
 ```
-
+test_database=# alter table orders rename to orders_simple;
+ALTER TABLE
+test_database=# create table orders (id integer, title varchar(80), price integer) partition by range(price);
+CREATE TABLE
+test_database=# create table orders_less499 partition of orders for values from (0) to (499);
+CREATE TABLE
+test_database=# create table orders_more499 partition of orders for values from (499) to (999999999);
+CREATE TABLE
+test_database=# insert into orders (id, title, price) select * from orders_simple;
+INSERT 0 8
+test_database=# 
+```
+При изначальном проектировании таблиц нужно сделать ее секционированной, тогда не пришлось бы переименовывать исходную таблицу и переносить данные в новую. 
