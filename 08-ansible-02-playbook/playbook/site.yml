@@ -5,14 +5,11 @@
     - list:
       - sudo
       - curl
-            
-
   tasks:
-    
     - name: Install packets
-      apt: name="{{list}}"
+      apt: name="{{ list }}"
        update_cache=yes
-       state=latest 
+       #state=latest 
     - name: Set facts for Java 11 vars
       set_fact:
        java_home: "/opt/jdk/{{ java_jdk_version }}"
@@ -81,7 +78,7 @@
         src: templates/elk.sh.j2
         dest: /etc/profile.d/elk.sh
       tags: elastic
-   
+#   
 - name: Install Kibana
   hosts: kibana
   tasks:
@@ -115,7 +112,6 @@
           - skip_ansible_lint
           - kibana
       - name: Set environment Kibana
-        #become: true
         template:
           src: templates/kib.sh.j2
           dest: /etc/profile.d/kib.sh
