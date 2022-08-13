@@ -1,10 +1,12 @@
-###07-terraform-03-basic
+##07-terraform-03-basic
 
-nout2% terraform  workspace list
+```nout2% terraform  workspace list
   default
 * prod
   stage
+```
 
+```
 nout2% terraform  plan                  
 data.aws_ami.amazon_linux: Reading...
 aws_s3_bucket.bucket[1]: Refreshing state... [id=netology1-1-prod]
@@ -140,3 +142,5 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
 Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly
 these actions if you run "terraform apply" now.
+
+```
