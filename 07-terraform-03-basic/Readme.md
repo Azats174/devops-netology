@@ -1,5 +1,54 @@
 ### 07-terraform-03-basic
 
+Listing  main.tf
+```
+terraform {
+  backend "s3" {
+    bucket = "netology1"
+    key    = "AKIA45XIWXEBF6Y3ZDT3"
+    secret_key = "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"
+    region = "us-east-2"
+  }
+}
+
+provider "aws" {
+                region = "us-east-2"
+        }
+
+locals {
+  test_instance_type_map = {
+  stage = "t2.micro"
+  prod = "t3.micro"
+  } 
+
+  test_instance_count_map = {
+  stage = "1"
+  prod = "2"
+  default = "1"
+  }
+}
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+}
+resource "aws_instance" "test" {
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "local.test_instance_type_map[terraform.workspace]"
+#  count = "local.test_instance_count_map[terraform.workspace]"
+}
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "netology1-${count.index}-${terraform.workspace}"
+  acl    = "private"
+  tags = {
+    Name        = "Bucket ${count.index}"
+    Environment = terraform.workspace
+  }
+  count = local.test_instance_count_map[terraform.workspace]
+}
+```
+
+
 ```nout2% terraform  workspace list
   default
 * prod
